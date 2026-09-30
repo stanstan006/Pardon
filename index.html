@@ -255,17 +255,53 @@
       to   { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
     }
 
-    @media (max-width: 430px) {
-      .card { padding: 34px 20px 26px; }
-      .question { font-size: 1.3rem; }
-    }
+   /* Anti-agrandissement automatique du texte sur iOS (surtout en paysage) */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-      }
-    }
+/* Petits écrans (dont iPhone Air, 420 px de large) */
+@media (max-width: 430px) {
+  .card { padding: 34px 20px 26px; border-radius: 26px; }
+  .heart { font-size: 58px; }
+  .intro { font-size: 1rem; line-height: 1.65; }
+  .question { font-size: 1.3rem; }
+}
+
+/* iPhone Air : 420 × 912 px, @3x (écran haut et étroit) */
+@media only screen
+  and (min-width: 400px) and (max-width: 440px)
+  and (min-height: 860px)
+  and (-webkit-min-device-pixel-ratio: 3) {
+
+  body {
+    padding-top: max(28px, env(safe-area-inset-top));      /* évite la Dynamic Island */
+    padding-bottom: max(28px, env(safe-area-inset-bottom)); /* évite la barre d'accueil */
+  }
+
+  .card { width: 100%; padding: 38px 22px 28px; }
+  .buttons { height: 220px; }                 /* plus de place pour que le « Non » s'échappe */
+  #yesBtn { padding: 18px 26px; font-size: 1.05rem; }
+  #noBtn  { font-size: .92rem; }
+  .hint   { min-height: 2.6em; }              /* évite que la carte saute quand le message change sur 2 lignes */
+}
+
+/* Paysage (iPhone Air : 912 × 420) */
+@media (orientation: landscape) and (max-height: 500px) {
+  body {
+    place-items: start center;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
+  }
+  .card { padding: 22px 24px 18px; }
+  .heart { font-size: 40px; margin-bottom: 4px; }
+  h1 { margin: 0 0 8px; font-size: 1.8rem; }
+  .intro { font-size: .95rem; line-height: 1.5; }
+  .question { margin: 14px 0 4px; font-size: 1.2rem; }
+  .buttons { height: 190px; margin-top: 6px; }
+  .footer { margin-top: 10px; }
+}
   </style>
 </head>
 
