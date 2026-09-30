@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f9b8ca">
+  <meta name="robots" content="noindex">
+  <meta property="og:title" content="Une petite question ❤️">
+  <meta property="og:description" content="J'ai quelque chose à te demander...">
+  <title>Une petite question ❤️</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+
+  <!-- Polices (facultatif : la page reste jolie sans connexion grâce aux polices de secours) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #3a1722;
+      --muted: #69434f;
+      --soft: #855563;
+      --rose: #d92a5c;
+      --rose-glow: rgba(217, 42, 92, .35);
+      --line: #efc5d0;
+      --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+      --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding:
+        max(20px, env(safe-area-inset-top))
+        16px
+        max(20px, env(safe-area-inset-bottom));
+      font-family: var(--font-body);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255, 255, 255, .75), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(255, 255, 255, .45), transparent 40%),
+        linear-gradient(135deg, #ffe1e8, #ffd0dc 45%, #f9b8ca);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 520px);
+      padding: 40px 28px 30px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, .86);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 25px 70px rgba(115, 25, 55, .22);
+      text-align: center;
+    }
+
+    .heart {
+      display: inline-block;
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 10px;
+      animation: beat 1.25s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      15%      { transform: scale(1.16); }
+      30%      { transform: scale(1); }
+      45%      { transform: scale(1.1); }
+    }
+
+    h1, h2 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      line-height: 1.15;
+      text-wrap: balance;
+    }
+
+    h1 {
+      margin: 4px 0 14px;
+      font-size: clamp(2rem, 8vw, 2.75rem);
+    }
+
+    .intro {
+      margin: 0 auto;
+      max-width: 420px;
+      font-size: 1.06rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .question {
+      margin: 26px 0 6px;
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .hint {
+      min-height: 1.7em;
+      margin: 0;
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--soft);
+    }
+
+    /* Zone de jeu : les deux boutons y sont positionnés en absolu */
+    .buttons {
+      position: relative;
+      height: 200px;
+      max-width: 400px;
+      margin: 12px auto 0;
+    }
+
+    button {
+      font: inherit;
+      border: 0;
+      border-radius: 999px;
+      padding: 16px 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 3px;
+    }
+
+    /* La propriété "scale" est indépendante de "transform" :
+       plus de conflit entre les animations et le positionnement. */
+    #yesBtn {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      width: max-content;
+      margin-inline: auto;
+      z-index: 3;
+      scale: var(--yes-scale, 1);
+      background: var(--rose);
+      color: #fff;
+      box-shadow: 0 10px 25px var(--rose-glow);
+      transition: scale .25s ease, box-shadow .2s ease, filter .2s ease;
+    }
+
+    #yesBtn:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 14px 30px var(--rose-glow);
+    }
+
+    #noBtn {
+      position: absolute;
+      top: 132px;
+      left: 50%;
+      translate: -50% 0;           /* remplacé par des px dès que le JS a positionné le bouton */
+      z-index: 2;
+      max-width: 100%;
+      padding: 12px 18px;
+      font-size: .9rem;
+      white-space: nowrap;
+      scale: var(--no-scale, 1);
+      background: #fff;
+      color: var(--muted);
+      border: 2px solid var(--line);
+      box-shadow: 0 7px 18px rgba(90, 30, 50, .12);
+    }
+
+    #noBtn.ready {
+      transition:
+        left .3s cubic-bezier(.34, 1.56, .64, 1),
+        top .3s cubic-bezier(.34, 1.56, .64, 1),
+        scale .25s ease;
+    }
+
+    #noBtn.wiggle { animation: wiggle .35s ease; }
+
+    @keyframes wiggle {
+      0%, 100% { rotate: 0deg; }
+      25%      { rotate: -6deg; }
+      75%      { rotate: 6deg; }
+    }
+
+    .footer {
+      margin: 18px 0 0;
+      font-size: .85rem;
+      color: #8a5b69;
+    }
+
+    /* Écran final */
+    .success { animation: appear .7s ease both; }
+
+    .success .big-heart {
+      display: inline-block;
+      font-size: 85px;
+      line-height: 1;
+      animation: pop .8s ease both;
+    }
+
+    .success h2 {
+      margin: 12px 0 10px;
+      font-size: clamp(1.7rem, 6.5vw, 2.1rem);
+    }
+
+    .success h2:focus { outline: none; }
+
+    .success p {
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .small-note {
+      margin-top: 24px;
+      font-size: .9rem;
+      color: #8a5b69;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pop {
+      0%   { transform: scale(.2); opacity: 0; }
+      70%  { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    /* Cœurs flottants */
+    .floating-heart {
+      position: fixed;
+      bottom: -40px;
+      z-index: 5;
+      pointer-events: none;
+      user-select: none;
+      animation: floatUp linear forwards;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0deg); opacity: .95; }
+      to   { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
+    }
+
+    @media (max-width: 430px) {
+      .card { padding: 34px 20px 26px; }
+      .question { font-size: 1.3rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="card">
+
+    <section id="mainScreen">
+      <div class="heart" aria-hidden="true">❤️</div>
+
+      <h1 id="title">Pour toi...</h1>
+
+      <p class="intro">
+        Je sais qu'en ce moment on est un peu en froid...
+        et je n'aime vraiment pas ça. 🥺
+        <br><br>
+        Alors j'ai préparé une petite question pour toi.
+      </p>
+
+      <div class="question">Est-ce que tu me pardonnes ? 🥹</div>
+
+      <p class="hint" id="hint" aria-live="polite">Réfléchis bien... 😏</p>
+
+      <div class="buttons" id="gameArea">
+        <button type="button" id="yesBtn">💚 Je te pardonne</button>
+        <button type="button" id="noBtn">😤 Non, je ne te pardonne pas</button>
+      </div>
+
+      <p class="footer">
+        Promis, cette page n'a été créée qu'avec beaucoup d'amour. ❤️
+      </p>
+    </section>
+
+    <section class="success" id="successScreen" hidden>
+      <div class="big-heart" aria-hidden="true">🥰</div>
+
+      <h2 id="successTitle" tabindex="-1">Je savais que tu avais un grand cœur ❤️</h2>
+
+      <p>
+        Merci de me pardonner. 🥹
+        <br>
+        Maintenant, on arrête de bouder et on fait la paix. 🤝❤️
+        <br><br>
+        Je tiens vraiment à toi. 💕
+      </p>
+
+      <div class="small-note" id="note">
+        PS : Maintenant tu me dois un câlin. 😌
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ─── Personnalisation ─────────────────────────────────────────────
+    const CONFIG = {
+      destinataire: "",   // ex : "Amina"  → "Pour toi, Amina..."
+      expediteur: "",     // ex : "Stan"   → signature sur l'écran final
+      messages: [
+        "Tu es sûre ? 🥺",
+        "Réfléchis encore un peu... ❤️",
+        "Le bouton commence à avoir peur 😭",
+        "Même le bouton sait que tu vas me pardonner 😂",
+        "Allez... fais-moi plaisir 🥹",
+        "Tu ne vas quand même pas cliquer dessus ? 😭",
+        "Dernière chance... ❤️"
+      ],
+      coeursVictoire: 35
+    };
+
+    // ─── Éléments ─────────────────────────────────────────────────────
+    const card = document.querySelector(".card");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const gameArea = document.getElementById("gameArea");
+    const hint = document.getElementById("hint");
+    const mainScreen = document.getElementById("mainScreen");
+    const successScreen = document.getElementById("successScreen");
+    const successTitle = document.getElementById("successTitle");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let attempts = 0;
+    let lastDodge = 0;
+    let finished = false;
+    let noX = 0;
+    let noY = 0;
+
+    // Personnalisation du texte
+    if (CONFIG.destinataire) {
+      document.getElementById("title").textContent = "Pour toi, " + CONFIG.destinataire + "...";
+    }
+    if (CONFIG.expediteur) {
+      document.getElementById("note").textContent += " — " + CONFIG.expediteur;
+    }
+
+    // ─── Bouton « Non » ───────────────────────────────────────────────
+    function setNoPosition(x, y) {
+      noX = x;
+      noY = y;
+      noBtn.style.translate = "none";
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+
+    function placeNoAtHome() {
+      setNoPosition((gameArea.clientWidth - noBtn.offsetWidth) / 2, 132);
+    }
+
+    function dodge(pointer) {
+      const now = performance.now();
+      if (finished || now - lastDodge < 250) return;
+      lastDodge = now;
+      attempts++;
+
+      // Le « Oui » grandit, le « Non » rétrécit un peu à chaque tentative
+      const yesScale = Math.min(1 + attempts * 0.07, 1.45);
+      const noScale = Math.max(1 - attempts * 0.04, 0.75);
+      gameArea.style.setProperty("--yes-scale", yesScale);
+      gameArea.style.setProperty("--no-scale", noScale);
+
+      const area = gameArea.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const w = noBtn.offsetWidth;
+      const h = noBtn.offsetHeight;
+
+      // Le bouton peut se balader dans toute la carte, sous la question
+      const minX = cardRect.left + 10 - area.left;
+      const maxX = cardRect.right - 10 - area.left - w;
+      const minY = 0;
+      const maxY = cardRect.bottom - 14 - area.top - h;
+
+      // Zone occupée par le « Oui » (avec sa future taille) : interdite
+      const yesCX = yesBtn.offsetLeft + yesBtn.offsetWidth / 2;
+      const yesCY = yesBtn.offsetTop + yesBtn.offsetHeight / 2;
+      const yesHW = (yesBtn.offsetWidth * yesScale) / 2 + 14;
+      const yesHH = (yesBtn.offsetHeight * yesScale) / 2 + 14;
+
+      // Point de référence : le pointeur, ou la position actuelle du bouton
+      const refX = pointer ? pointer.clientX : area.left + noX + w / 2;
+      const refY = pointer ? pointer.clientY : area.top + noY + h / 2;
+
+      let best = null;
+      let bestDist = -1;
+
+      for (let i = 0; i < 40; i++) {
+        const x = minX + Math.random() * Math.max(0, maxX - minX);
+        const y = minY + Math.random() * Math.max(0, maxY - minY);
+
+        const overlapsYes =
+          x < yesCX + yesHW && x + w > yesCX - yesHW &&
+          y < yesCY + yesHH && y + h > yesCY - yesHH;
+        if (overlapsYes) continue;
+
+        const dist = Math.hypot(area.left + x + w / 2 - refX, area.top + y + h / 2 - refY);
+        if (dist > bestDist) {
+          best = { x, y };
+          bestDist = dist;
+        }
+        if (dist >= 120) break;   // assez loin, on prend
+      }
+
+      if (best) setNoPosition(best.x, best.y);
+
+      hint.textContent = CONFIG.messages[Math.min(attempts - 1, CONFIG.messages.length - 1)];
+
+      noBtn.classList.remove("wiggle");
+      void noBtn.offsetWidth;   // relance l'animation
+      noBtn.classList.add("wiggle");
+    }
+
+    // Ordinateur : le bouton fuit quand la souris s'approche
+    document.addEventListener("pointermove", function (event) {
+      if (finished || event.pointerType !== "mouse") return;
+      const r = noBtn.getBoundingClientRect();
+      const dx = Math.max(r.left - event.clientX, 0, event.clientX - r.right);
+      const dy = Math.max(r.top - event.clientY, 0, event.clientY - r.bottom);
+      if (Math.hypot(dx, dy) < 70) dodge(event);
+    });
+
+    // Téléphone / stylet : il fuit au toucher
+    noBtn.addEventListener("pointerdown", function (event) {
+      if (event.pointerType === "mouse") return;
+      event.preventDefault();
+      dodge(event);
+    });
+
+    // Clavier (Entrée / Espace) ou clic qui passerait entre les mailles
+    noBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      dodge(null);
+    });
+
+    // Positionnement initial (et après chargement des polices / rotation de l'écran)
+    function initNo() {
+      if (attempts === 0) placeNoAtHome();
+    }
+    initNo();
+    requestAnimationFrame(() => noBtn.classList.add("ready"));
+    window.addEventListener("resize", initNo);
+    window.addEventListener("load", initNo);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(initNo);
+
+    // ─── Victoire ─────────────────────────────────────────────────────
+    yesBtn.addEventListener("click", function () {
+      finished = true;
+      mainScreen.hidden = true;
+      successScreen.hidden = false;
+      successTitle.focus({ preventScroll: true });
+
+      if (navigator.vibrate) navigator.vibrate(40);
+
+      for (let i = 0; i < CONFIG.coeursVictoire; i++) {
+        setTimeout(createHeart, i * 60);
+      }
+    });
+
+    // ─── Cœurs flottants ──────────────────────────────────────────────
+    const HEARTS = ["❤️", "💕", "💖", "💗", "💓", "💘"];
+
+    function createHeart() {
+      if (reduceMotion.matches) return;
+      if (document.querySelectorAll(".floating-heart").length > 45) return;
+
+      const heart = document.createElement("div");
+      heart.className = "floating-heart";
+      heart.setAttribute("aria-hidden", "true");
+      heart.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
+      heart.style.left = Math.random() * 96 + "vw";
+      heart.style.fontSize = 18 + Math.random() * 28 + "px";
+      heart.style.animationDuration = 3 + Math.random() * 4 + "s";
+      heart.addEventListener("animationend", () => heart.remove());
+      document.body.appendChild(heart);
+    }
+
+    // Quelques cœurs discrets en arrière-plan
+    setInterval(function () {
+      if (document.visibilityState === "visible") createHeart();
+    }, 2200);
+  </script>
+
+</body>
+</html>
